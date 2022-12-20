@@ -1,0 +1,177 @@
+' ###################################################################
+' Script For automatic microRaman Mapping
+' December 2022
+' ###################################################################
+
+Const ACQ_IMAGE = 1
+Const NM_TO_NM = -1
+
+Const MOTOR_VALUE = 0
+Const ACQ_SPECTRUM = 0
+Const CREATE_MAP = 0
+Const ADD_TO_MAP = 1
+Const ACQ_AUTO_SHOW = 10
+Const CM1_TO_NM = 0
+
+Dim MapLabels(1) 
+Dim MapUnits(1) 
+Dim MapAxis1() 
+Dim MapAxis2() 
+
+' ###################################################################
+' Acquisition parameters
+' ###################################################################
+
+' Set spectral range
+wMin=175
+wMax=3750
+
+' Set acquisition
+tSpc=3
+aSpc=5
+
+' Set Labels / Units
+MapLabels(0)="X"
+MapLabels(1)="Y"
+MapUnits(0)="um"
+MapUnits(1)="um"
+
+' Save path
+MapPath = "E:\UTENTI\Fabio Brugnara\Script test\"
+MapName = "Gypsym_map_"
+MapType = ".txt"
+
+' ###################################################################
+' MAP 1
+' ###################################################################
+Nmap=1
+
+' XYZ scan range
+Motor1StartPosition=-400   ' x-direction
+Motor1StopPosition=-200
+Motor1StepSize=25
+Motor2StartPosition=-400   ' y-direction
+Motor2StopPosition=-200
+Motor2StepSize=25
+Motor3StopPosition=-4.6    ' z-direction
+
+' Set the z-position
+MoveID=LabSpec.MoveMotor("Z",Motor3StopPosition,"",MOTOR_VALUE)
+do
+    Status=LabSpec.GetMotorStatus("Z",MoveID)
+Loop Until Status=0
+
+' Calculate the map size
+MapSize1=CLng((Motor1StopPosition-Motor1StartPosition)/Motor1StepSize)+1
+MapSize2=CLng((Motor2StopPosition-Motor2StartPosition)/Motor2StepSize)+1
+
+' Fill the map axes
+ReDim MapAxis1(MapSize1-1)
+ReDim MapAxis2(MapSize2-1)
+For Motor1Index=0 To MapSize1-1
+    MapAxis1(Motor1Index) = Motor1StartPosition+Motor1Index*Motor1StepSize
+Next
+For Motor2Index=0 To MapSize2-1
+    MapAxis2(Motor2Index) = Motor2StartPosition+Motor2Index*Motor2StepSize
+Next    
+
+' ###################################################################
+' Acquire the map
+' ###################################################################
+
+For Motor2Index=0 To MapSize2-1
+    ' Moving Y
+    MoveID=LabSpec.MoveMotor("Y",Motor2StartPosition+Motor2Index*Motor2StepSize,"",MOTOR_VALUE)
+    Do
+        Status=LabSpec.GetMotorStatus("Y",MoveID)
+    Loop Until Status=0
+    For Motor1Index=0 To MapSize1-1
+        ' Moving X
+        MoveID=LabSpec.MoveMotor("X",Motor1StartPosition+Motor1Index*Motor1StepSize,"",MOTOR_VALUE)
+       Do
+            Status=LabSpec.GetMotorStatus("Y",MoveID)
+        Loop Until Status=0        
+        ' Start an acquisition (after conversion from CM1 To NM)
+        LabSpec.Acq ACQ_SPECTRUM,tSpc,aSpc,LabSpec.ConvertUnit(wMin, CM1_TO_NM),LabSpec.ConvertUnit(wMax, CM1_TO_NM)
+        Do 
+            ' Wait until acquisition is done
+            DataID=LabSpec.GetAcqID() 
+        Loop Until DataID>0 
+        ' Add the spectrum To the map
+        If (Motor1Index=0 and Motor2Index=0) Then MapID=LabSpec.MapEx(CREATE_MAP,0,DataID,Motor2Index*MapSize2+Motor1Index,MapAxis1, MapAxis2, MapLabels, MapUnits)
+        If (Motor1Index>0 or  Motor2Index>0) Then MapID=LabSpec.MapEx(ADD_TO_MAP,MapID,DataID,Motor2Index*MapSize2+Motor1Index,MapAxis1, MapAxis2, MapLabels, MapUnits)
+    Next
+Next 
+
+' ###################################################################
+' Save Data To file
+' ###################################################################
+LabSpec.Save MapID, MapPath & MapName & Nmap & MapType, "txt"
+
+
+' ###################################################################
+' MAP 2
+' ###################################################################
+Nmap=2
+
+' XYZ scan range
+Motor1StartPosition=200   ' x-direction
+Motor1StopPosition=400
+Motor1StepSize=25
+Motor2StartPosition=200   ' y-direction
+Motor2StopPosition=400
+Motor2StepSize=25
+Motor3StopPosition=-26.7      ' z-direction
+
+' Set the z-position
+MoveID=LabSpec.MoveMotor("Z",Motor3StopPosition,"",MOTOR_VALUE)
+do
+    Status=LabSpec.GetMotorStatus("Z",MoveID)
+Loop Until Status=0
+
+' Calculate the map size
+MapSize1=CLng((Motor1StopPosition-Motor1StartPosition)/Motor1StepSize)+1
+MapSize2=CLng((Motor2StopPosition-Motor2StartPosition)/Motor2StepSize)+1
+
+' Fill the map axes
+ReDim MapAxis1(MapSize1-1)
+ReDim MapAxis2(MapSize2-1)
+For Motor1Index=0 To MapSize1-1
+    MapAxis1(Motor1Index) = Motor1StartPosition+Motor1Index*Motor1StepSize
+Next
+For Motor2Index=0 To MapSize2-1
+    MapAxis2(Motor2Index) = Motor2StartPosition+Motor2Index*Motor2StepSize
+Next    
+
+' ###################################################################
+' Acquire the map
+' ###################################################################
+
+For Motor2Index=0 To MapSize2-1
+    ' Moving Y
+    MoveID=LabSpec.MoveMotor("Y",Motor2StartPosition+Motor2Index*Motor2StepSize,"",MOTOR_VALUE)
+    Do
+        Status=LabSpec.GetMotorStatus("Y",MoveID)
+    Loop Until Status=0
+    For Motor1Index=0 To MapSize1-1
+        ' Moving X
+        MoveID=LabSpec.MoveMotor("X",Motor1StartPosition+Motor1Index*Motor1StepSize,"",MOTOR_VALUE)
+       Do
+            Status=LabSpec.GetMotorStatus("Y",MoveID)
+        Loop Until Status=0        
+        ' Start an acquisition (after conversion from CM1 To NM)
+        LabSpec.Acq ACQ_SPECTRUM,tSpc,aSpc,LabSpec.ConvertUnit(wMin, CM1_TO_NM),LabSpec.ConvertUnit(wMax, CM1_TO_NM)
+        Do 
+            ' Wait until acquisition is done
+            DataID=LabSpec.GetAcqID() 
+        Loop Until DataID>0 
+        ' Add the spectrum To the map
+        If (Motor1Index=0 and Motor2Index=0) Then MapID=LabSpec.MapEx(CREATE_MAP,0,DataID,Motor2Index*MapSize2+Motor1Index,MapAxis1, MapAxis2, MapLabels, MapUnits)
+        If (Motor1Index>0 or  Motor2Index>0) Then MapID=LabSpec.MapEx(ADD_TO_MAP,MapID,DataID,Motor2Index*MapSize2+Motor1Index,MapAxis1, MapAxis2, MapLabels, MapUnits)
+    Next
+Next 
+
+' ########################################################
+' Save Data To file
+' ########################################################
+LabSpec.Save MapID, MapPath & MapName & Nmap & MapType, "txt"
