@@ -87,8 +87,8 @@ with st.form(key='form'):
 
     lines[25] = 'wMin=' + str(nu_min) + '\n'
     lines[26] = 'wMax=' + str(nu_max) + '\n'
-    lines[29] = 'tSpec=' + str(t_int) + '\n'
-    lines[30] = 'aSpec=' + str(N_int)  + '\n'
+    lines[29] = 'tSpc=' + str(t_int) + '\n'
+    lines[30] = 'aSpc=' + str(N_int)  + '\n'
     lines[39] = 'MapPath = "' + folder + '"' + '\n'
 
 
