@@ -56,7 +56,7 @@ with st.form(key='form'):
     Y = col2.number_input('Y [um]', value=0.0, step=0.1)
     Z = col3.number_input('Z [um]', value=0.0, step=0.1)
 
-    if abs(Z)>500:
+    if abs(Z)>900:
         st.error("ERROR: Z is too large, risk of collision")
         st.stop()
 
