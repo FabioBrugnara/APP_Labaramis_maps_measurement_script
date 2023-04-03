@@ -18,7 +18,7 @@ with st.form(key='form'):
 
 
     ######################################
-    paths = ['E:\\UTENTI\\Fabio Brugnara\\', 'E:\\UTENTI\\Marco Zanatta\\', 'E:\\UTENTI\\Elisa Maccadenza\\']
+    paths = ['E:\\UTENTI\\Fabio Brugnara\\', 'E:\\UTENTI\\Marco Zanatta\\', 'E:\\UTENTI\\Elisa Maccadenza\\', 'E:\\UTENTI\\Erica Alfinelli\\automaps\\',]
     folder = st.selectbox('Select folder', paths)
 
     spectral_range = ['1. 175-3750 cm-1 for 300 gratings, 633 laser (2193.4 cm-1)', '2. 100-2080 cm-1 for 600 gratings, 633 laser', '3. 100-1050 cm-1 for 1200 gratings, 633 laser']
